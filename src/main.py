@@ -20,36 +20,39 @@ def pep(session):
     soup = BeautifulSoup(response.text, 'lxml')
     main_section = find_tag(soup, 'section', attrs={'id': 'numerical-index'})
     tr_tags = main_section.find_all('tr')
+    total = 0
+    different_status = []
     for tr_tag in tqdm(tr_tags[1:]):
-        td_tag = list(tr_tag.find('td').text)
-        if len(td_tag) == 2:
-            external_status = td_tag[1]
-        elif td_tag[0] not in EXPECTED_STATUS:
-            external_status = ''
-        else:
-            external_status = td_tag[0]
-        pep_link = tr_tag.find('a')['href']
+        status_column = find_tag(tr_tag, 'td')
+        external_status = status_column.text[1:]
+        pep_link = find_tag(tr_tag, 'a')['href']
         url = urljoin(PEP_URL, pep_link)
         response = get_response(session, url)
+        if response is None:
+            return
         soup = BeautifulSoup(response.text, 'lxml')
         dl_tag = find_tag(
             soup, 'dl', attrs={'class': 'rfc2822 field-list simple'}
         )
         abbr_tag = find_tag(dl_tag, 'abbr',)
         if abbr_tag.string not in EXPECTED_STATUS[external_status]:
-            logging.info(
-                'Несовпадающие статусы:'
-                f'{url}'
-                f'Статус в карточке: {abbr_tag.string}'
-                f'Ожидаемые статусы: {EXPECTED_STATUS[external_status]}'
+            different_status.append(
+                '''
+                Несовпадающие статусы:
+                {url}
+                Статус в карточке: {status}
+                Ожидаемые статусы: {expect_status}
+                '''.format(
+                    url=url, status=abbr_tag.string,
+                    expect_status=EXPECTED_STATUS[external_status]
+                )
             )
         COUNT_STATUS[external_status] += 1
-
+        total += 1
+    logging.info('\n'.join(different_status))
     results = [('Статус', 'Количество')]
-    for status in COUNT_STATUS:
-        results.append(
-            (status, str(COUNT_STATUS[status]))
-        )
+    results.extend(COUNT_STATUS.items())
+    results.append(('Total', total))
     return results
 
 
