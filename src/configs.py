@@ -14,13 +14,13 @@ def configure_argument_parser(available_modes):
     parser.add_argument(
         'mode',
         choices=available_modes,
-        help='Режим работы парсера'
+        help='Режимы работы парсера'
     )
     parser.add_argument(
         '-c',
         '--clear-cache',
         action='store_true',
-        help='Очистка кэша'
+        help='Очистка кеша'
     )
     parser.add_argument(
         '-o',

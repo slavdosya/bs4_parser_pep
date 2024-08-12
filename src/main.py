@@ -58,16 +58,14 @@ def whats_new(session):
     response = get_response(session, whats_new_url)
     if response is None:
         return
-
     soup = BeautifulSoup(response.text, features='lxml')
-
     main_div = find_tag(soup, 'section', attrs={'id': 'what-s-new-in-python'})
     div_with_ul = find_tag(main_div, 'div', attrs={'class': 'toctree-wrapper'})
     sections_by_python = div_with_ul.find_all(
         'li', attrs={'class': 'toctree-l1'}
     )
 
-    results = []
+    results = [('Ссылка на статью', 'Заголовок', 'Редактор, автор')]
 
     for section in tqdm(sections_by_python):
         version_a_tag = find_tag(section, 'a')
@@ -92,7 +90,7 @@ def whats_new(session):
     return results
 
 
-def latest_version(session):
+def latest_versions(session):
     response = get_response(session, MAIN_DOC_URL)
     if response is None:
         return
@@ -126,9 +124,8 @@ def latest_version(session):
 
 def download(session):
     downloads_url = urljoin(MAIN_DOC_URL, 'download.html')
-    if __name__ == '__main__':
-        response = session.get(downloads_url)
-        response.encoding = 'utf-8'
+    response = session.get(downloads_url)
+    response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'lxml')
     main_tag = find_tag(soup, 'div', attrs={'role': 'main'})
     table_tag = find_tag(main_tag, 'table', attrs={'class': 'docutils'})
@@ -148,7 +145,7 @@ def download(session):
 
 
 MODE_TO_FUNCTION = {
-    'latest-version': latest_version,
+    'latest-versions': latest_versions,
     'whats-new': whats_new,
     'download': download,
     'pep': pep,
