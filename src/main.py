@@ -20,7 +20,6 @@ def pep(session):
     soup = BeautifulSoup(response.text, 'lxml')
     main_section = find_tag(soup, 'section', attrs={'id': 'numerical-index'})
     tr_tags = main_section.find_all('tr')
-    total = 0
     different_status = []
     for tr_tag in tqdm(tr_tags[1:]):
         status_column = find_tag(tr_tag, 'td')
@@ -47,12 +46,11 @@ def pep(session):
                     expect_status=EXPECTED_STATUS[external_status]
                 )
             )
-        COUNT_STATUS[external_status] += 1
-        total += 1
+        COUNT_STATUS[abbr_tag.string] += 1
     logging.info('\n'.join(different_status))
     results = [('Статус', 'Количество')]
     results.extend(COUNT_STATUS.items())
-    results.append(('Total', total))
+    results.append(('Total', sum(COUNT_STATUS.values())))
     return results
 
 

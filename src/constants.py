@@ -18,14 +18,16 @@ EXPECTED_STATUS = {
     }
 
 COUNT_STATUS = {
-    'A': 0,
-    'D': 0,
-    'F': 0,
-    'P': 0,
-    'R': 0,
-    'S': 0,
-    'W': 0,
-    '': 0,
+    'Active': 0,
+    'Accepted': 0,
+    'Deferred': 0,
+    'Final': 0,
+    'Provisional': 0,
+    'Rejected': 0,
+    'Superseded': 0,
+    'Withdrawn': 0,
+    'Draft': 0,
+    'April Fool!': 0
 }
 
 PEP_URL = 'https://peps.python.org/'
